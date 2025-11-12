@@ -2,6 +2,7 @@
 #define __SERIAL_H__
 
 #include <pthread.h>
+#include <zlib.h>
 
 // Structure to hold compressed file result
 typedef struct {
@@ -26,6 +27,9 @@ typedef struct {
     int *total_in;
     int *total_out;
     pthread_mutex_t *stats_mutex;
+    unsigned char *buffer_in;     // Thread buffer for reusing instead of allocating per file
+    unsigned char *buffer_out;    // Thread buffer for reusing
+    z_stream *strm;            // Pre-initialized zlib stream
 } ThreadArgs;
 
 int compress_directory(char *directory_name);
