@@ -9,7 +9,7 @@
 #include "serial.h"
 
 #define BUFFER_SIZE 1048576 // 1MB
-#define MAX_WORKER_THREADS 6
+#define MAX_WORKER_THREADS 8
 
 int cmp(const void *a, const void *b) {
 	return strcmp(*(char **) a, *(char **) b);
