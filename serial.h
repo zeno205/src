@@ -1,36 +1,56 @@
-#ifndef __SERIAL_H__
-#define __SERIAL_H__
+#ifndef SERIAL_H
+#define SERIAL_H
+
+/*
+ * Project 2: Text ZIP Compression
+ * Group: [Your Group Number/Name]
+ * Authors: 
+ *   - [Name1] ([NetID1])
+ *   - [Name2] ([NetID2])
+ *   - [Name3] ([NetID3])
+ *   - [Name4] ([NetID4]) [if applicable]
+ * 
+ * Description: Parallel text file compression using pthreads.
+ */
 
 #include <pthread.h>
 #include <zlib.h>
 
-// Structure to hold compressed file result
+// Compressed result container
+// Threads finish asynchronously, so results are buffered in memory
+// for sequential writing by the main thread
 typedef struct {
-    unsigned char *data;      // Compressed data buffer
-    int size;                 // Size of compressed data
-    int original_size;        // Original uncompressed size
-} CompressedResult;
+	unsigned char *data; // compressed data buffer
+	int size; // compressed data length
+	int orig_size; // original file size for stats
+} CompResult;
 
-// Work queue structure for thread-safe file distribution
+// Shared list of tasks
+// Acts as synchronized task distributor for worker threads
 typedef struct {
-    char **files;             // Array of file paths
-    int total_files;          // Total number of files
-    int next_index;           // Next file index to process
-    pthread_mutex_t mutex;    // Mutex for thread-safe access
-} WorkQueue;
+	char **files; // array of file paths to process
+	int total; // total number of files
+	int next_idx; // index of next file to assign
+	pthread_mutex_t lock; // synchronization lock for thread-safe access
+} TaskQueue;
 
-// Arguments passed to worker threads
+// Thread arguments
+// Bundles shared resources and thread local buffers
 typedef struct {
-    WorkQueue *queue;
-    CompressedResult *results;
-    char *directory_name;
-    int *total_in;
-    int *total_out;
-    pthread_mutex_t *stats_mutex;
-    unsigned char *buffer_in;     // Thread buffer for reusing instead of allocating per file
-    unsigned char *buffer_out;    // Thread buffer for reusing
-    z_stream *strm;            // Pre-initialized zlib stream
-} ThreadArgs;
+	TaskQueue *queue; // shared list of tasks
+	CompResult *results; // shared results array
+	char *dir_name; // base directory path
+
+	// Global statistics counters (shared)
+	int *total_in;
+	int *total_out;
+	pthread_mutex_t *stats_lock; // lock for updating stats
+
+	// Thread-local buffers to avoid allocation overhead
+	unsigned char *buf_in; // 1MB input buffer
+	unsigned char *buf_out; // 1MB output buffer
+	z_stream *strm; // zlib compression state
+} WorkerArgs;
 
 int compress_directory(char *directory_name);
 
