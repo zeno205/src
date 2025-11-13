@@ -3,14 +3,14 @@
 
 /*
  * Project 2: Text ZIP Compression
- * Group: [Your Group Number/Name]
+ * Group: 20
  * Authors: 
- *   - [Name1] ([NetID1])
- *   - [Name2] ([NetID2])
- *   - [Name3] ([NetID3])
- *   - [Name4] ([NetID4]) [if applicable]
+ * Rice Pham U11328727
+ * Harry Pham U60334857
+ * Jolie Nguyen U71766734
+ * Veera Saideep Sasank Vulavakayala U83668312
  * 
- * Description: Parallel text file compression using pthreads.
+ * Description: Parallel text compression tool that scans a directory for input files and compresses them into a single archive. It uses a shared task queue and multiple pthread worker threads so files can be processed at the same time. Each thread compresses data on its own and results are written out in the same order every time
  */
 
 #include <pthread.h>
